@@ -1,0 +1,30 @@
+{
+  "name": "cardiovascular-prediction-system",
+  "version": "1.0.0",
+  "description": "AI-based cardiovascular disease prediction system using Google Gemini API",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cardiovascular",
+    "health",
+    "AI",
+    "Gemini",
+    "prediction"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.3.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
