@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cardiovascular Risk Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .risk-meter {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .risk-progress {
+            height: 100%;
+            transition: width 1s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Your Cardiovascular Risk Assessment</h1>
+                <p class="text-lg text-gray-600">Based on your health information</p>
+            </div>
+
+            <div class="bg-white shadow rounded-lg p-8 mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Risk Level</h2>
+                    <span id="risk-category" class="px-3 py-1 rounded-full text-sm font-medium"></span>
+                </div>
+
+                <div class="mb-6">
+                    <div class="risk-meter mb-2">
+                        <div id="risk-progress" class="risk-progress"></div>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span>0%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-4xl font-bold mb-2" id="risk-percentage">0%</p>
+                    <p class="text-gray-600" id="risk-description"></p>
+                </div>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2">
+                <!-- Lifestyle Recommendations -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-100 p-2 rounded-full mr-3">
+                            <i class="fas fa-heartbeat text-blue-500"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900">Lifestyle Recommendations</h3>
+                    </div>
+                    <ul class="space-y-3" id="lifestyle-recommendations">
+                        <!-- Will be populated by JavaScript -->
+                    </ul>
+                </div>
+
+                <!-- Medical Recommendations -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-purple-100 p-2 rounded-full mr-3">
+                            <i class="fas fa-clinic-medical text-purple-500"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900">Medical Recommendations</h3>
+                    </div>
+                    <ul class="space-y-3" id="medical-recommendations">
+                        <!-- Will be populated by JavaScript -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <a href="/" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-redo mr-2"></i> Start New Assessment
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the stored result from sessionStorage
+            const result = JSON.parse(sessionStorage.getItem('riskResult'));
+            
+            if (!result) {
+                window.location.href = '/';
+                return;
+            }
+
+            // Set risk percentage
+            const riskPercentage = result.riskPercentage || 0;
+            document.getElementById('risk-percentage').textContent = `${riskPercentage}%`;
+            
+            // Animate progress bar
+            setTimeout(() => {
+                document.getElementById('risk-progress').style.width = `${riskPercentage}%`;
+            }, 100);
+
+            // Set risk category and color
+            const riskCategory = result.riskCategory || 'Low';
+            const categoryElement = document.getElementById('risk-category');
+            categoryElement.textContent = riskCategory;
+
+            let bgColor, textColor, progressColor;
+            if (riskPercentage < 30) {
+                bgColor = 'bg-green-100';
+                textColor = 'text-green-800';
+                progressColor = 'bg-green-500';
+                document.getElementById('risk-description').textContent = 'Low risk of cardiovascular disease';
+            } else if (riskPercentage < 70) {
+                bgColor = 'bg-yellow-100';
+                textColor = 'text-yellow-800';
+                progressColor = 'bg-yellow-500';
+                document.getElementById('risk-description').textContent = 'Moderate risk of cardiovascular disease';
+            } else {
+                bgColor = 'bg-red-100';
+                textColor = 'text-red-800';
+                progressColor = 'bg-red-500';
+                document.getElementById('risk-description').textContent = 'High risk of cardiovascular disease';
+            }
+            categoryElement.classList.add(bgColor, textColor);
+            document.getElementById('risk-progress').classList.add(progressColor);
+
+            // Populate recommendations
+            const lifestyleRecs = result.recommendations?.lifestyle || [
+                'Engage in at least 150 minutes of moderate aerobic activity per week',
+                'Eat a diet rich in fruits, vegetables, whole grains, and lean proteins',
+                'Limit sodium intake to less than 2,300 mg per day',
+                'Maintain a healthy weight (BMI between 18.5 and 24.9)'
+            ];
+
+            const medicalRecs = result.recommendations?.medical || [
+                'Schedule regular check-ups with your primary care physician',
+                'Monitor your blood pressure regularly',
+                'Get your cholesterol checked every 4-6 years (more often if at risk)',
+                'Consider talking to your doctor about preventive medications if at high risk'
+            ];
+
+            const lifestyleList = document.getElementById('lifestyle-recommendations');
+            lifestyleRecs.forEach(rec => {
+                const li = document.createElement('li');
+                li.className = 'flex items-start';
+                li.innerHTML = `
+                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                    <span>${rec}</span>
+                `;
+                lifestyleList.appendChild(li);
+            });
+
+            const medicalList = document.getElementById('medical-recommendations');
+            medicalRecs.forEach(rec => {
+                const li = document.createElement('li');
+                li.className = 'flex items-start';
+                li.innerHTML = `
+                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                    <span>${rec}</span>
+                `;
+                medicalList.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>
